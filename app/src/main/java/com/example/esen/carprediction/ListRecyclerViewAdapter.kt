@@ -7,21 +7,22 @@ import android.view.ViewGroup
 import android.widget.TextView
 
 
-import com.example.esen.carprediction.BrandsFragment.OnListFragmentInteractionListener
+import com.example.esen.carprediction.ListFragment.OnListFragmentInteractionListener
 
 import kotlinx.android.synthetic.main.fragment_brands.view.*
 
-class BrandsRecyclerViewAdapter(
+class ListRecyclerViewAdapter(
+        private val field: String,
         private val mValues: ArrayList<String>,
         private val mListener: OnListFragmentInteractionListener?)
-    : RecyclerView.Adapter<BrandsRecyclerViewAdapter.ViewHolder>() {
+    : RecyclerView.Adapter<ListRecyclerViewAdapter.ViewHolder>() {
 
     private val mOnClickListener: View.OnClickListener
 
     init {
         mOnClickListener = View.OnClickListener { v ->
             val item = v.tag as String
-            mListener?.onBrandListInteraction(item)
+            mListener?.onItemListInteraction(field, item)
         }
     }
 
@@ -32,7 +33,6 @@ class BrandsRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        println("The size is ${mValues.size} and first value ${mValues[0]}")
         val item = mValues[position]
         holder.mIdView.text = item
 

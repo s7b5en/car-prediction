@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.os.Bundle
+import android.util.Log
+import com.example.esen.carprediction.data.models.PredictionParams
 import com.example.esen.carprediction.data.remote.api.CarsApiService
 import com.example.esen.carprediction.di.component.DaggerCarsApiComponent
 import com.example.esen.carprediction.di.module.CarsApiModule
@@ -14,13 +16,14 @@ import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
 
-val NUMBER_OF_SLIDES = 10
+const val NUMBER_OF_SLIDES = 10
 
-class MainActivity : AppCompatActivity(), BrandsFragment.OnListFragmentInteractionListener {
+class MainActivity : AppCompatActivity(), ListFragment.OnListFragmentInteractionListener {
     @Inject
     lateinit var carsFetcherService: CarsApiService
 
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
+    private val mPredictionParams = PredictionParams()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,17 +48,32 @@ class MainActivity : AppCompatActivity(), BrandsFragment.OnListFragmentInteracti
                 .inject(this)
     }
 
-    override fun onBrandListInteraction(brand: String) {
+    override fun onItemListInteraction(field: String, value: String) {
+        when (field) {
+            "brand" -> { mPredictionParams.brand = value }
+            "wheel" -> { mPredictionParams.wheel = value }
+            "year" -> { mPredictionParams.year = value }
+            "transmission" -> { mPredictionParams.transmission = value }
+            "mileage" -> { mPredictionParams.mileage = value }
+            "capacity" -> { mPredictionParams.capacity = value }
+            "drive" -> { mPredictionParams.drive = value }
+            "color" -> { mPredictionParams.color = value }
+            "carcass" -> { mPredictionParams.carcass = value }
+            "fuel" -> { mPredictionParams.fuel = value }
+        }
+    }
 
+    val x: Callback = {
+        Log.d("tag", "dicks")
     }
 
 
     inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
         override fun getItem(position: Int): Fragment {
             val brands = carsFetcherService.getBrands()
-            return when(position) {
-                1 -> BrandsFragment.newInstance(brands)
-                else -> BrandsFragment.newInstance(brands)
+            return when (position) {
+                1 -> ListFragment.newInstance("brand", brands)
+                else -> ListFragment.newInstance("brand", brands)
             }
 
         }

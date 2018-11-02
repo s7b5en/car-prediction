@@ -9,16 +9,14 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.esen.carprediction.data.remote.models.Brands
+import kotlin.reflect.jvm.internal.impl.metadata.ProtoBuf
 
-/**
- * A fragment representing a list of Items.
- * Activities containing this fragment MUST implement the
- * [BrandsFragment.OnListFragmentInteractionListener] interface.
- */
-class BrandsFragment : Fragment() {
+typealias Callback = () -> Unit
+
+class ListFragment : Fragment() {
     private var columnCount = 1
-    private var brands = ArrayList<String>()
+    private var values = ArrayList<String>()
+    private lateinit var field: String
 
     private var listener: OnListFragmentInteractionListener? = null
 
@@ -27,7 +25,8 @@ class BrandsFragment : Fragment() {
 
         arguments?.let {
             columnCount = it.getInt(ARG_COLUMN_COUNT)
-            brands = it.getStringArrayList(BRANDS)
+            values = it.getStringArrayList(VALUES_KEY)!!
+            field = it.getString(FIELD_KEY).orEmpty()
         }
     }
 
@@ -35,14 +34,13 @@ class BrandsFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_brands_list, container, false)
 
-        // Set the adapter
         if (view is RecyclerView) {
             with(view) {
                 layoutManager = when {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = BrandsRecyclerViewAdapter(brands, listener)
+                adapter = ListRecyclerViewAdapter(field, values, listener)
             }
         }
 
@@ -63,30 +61,22 @@ class BrandsFragment : Fragment() {
         listener = null
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson
-     * [Communicating with Other Fragments](http://developer.android.com/training/basics/fragments/communicating.html)
-     * for more information.
-     */
-    interface OnListFragmentInteractionListener {
-        fun onBrandListInteraction(brand: String)
+
+     interface OnListFragmentInteractionListener {
+        fun onItemListInteraction(field:String, value: String)
     }
 
     companion object {
         const val ARG_COLUMN_COUNT = "column-count"
-        const val BRANDS = "brands"
+        const val VALUES_KEY = "values"
+        const val FIELD_KEY = "field"
 
         @JvmStatic
-        fun newInstance(brands: ArrayList<String>?): BrandsFragment {
-            val fragment = BrandsFragment()
+        fun newInstance(field: String, values: ArrayList<String>?): ListFragment {
+            val fragment = ListFragment()
             val args = Bundle()
-            args.putStringArrayList(BRANDS, brands)
+            args.putStringArrayList(VALUES_KEY, values)
+            args.putStringArrayList(FIELD_KEY, values)
             fragment.arguments = args
             return fragment
         }
